@@ -40,11 +40,29 @@ def extract_names(filename):
   followed by the name-rank strings in alphabetical order.
   ['2006', 'Aaliyah 91', Aaron 57', 'Abagail 895', ' ...]
   """
-  # +++your code here+++
-  return
+  list_to_return = []
+  input_file = open(filename, 'r')
+  content = input_file.read()
+  year = re.search(r'Popularity\sin\s(\d\d\d\d)', content)
+  list_to_return.append(year.group(1))
+  print list_to_return
+  names = re.findall('<td>(\\d+)</td><td>(\\w+)</td>\\<td>(\\w+)</td>', content)
+  to_be_ranked = {}
+  for name in names:
+    rank, boy, girl = name
+    if boy not in to_be_ranked:
+      to_be_ranked[boy] = rank
+    if girl not in to_be_ranked:
+      to_be_ranked[girl] = rank
 
+  sorted_names = sorted(to_be_ranked.keys())
 
-def main():
+  for each_name in sorted_names:
+    list_to_return.append(each_name + " " + to_be_ranked[each_name])
+
+  return list_to_return
+
+def main(): 
   # This command-line parsing code is provided.
   # Make a list of command line arguments, omitting the [0] element
   # which is the script itself.
@@ -60,9 +78,23 @@ def main():
     summary = True
     del args[0]
 
+
   # +++your code here+++
   # For each filename, get the names, then either print the text output
   # or write it to a summary file
-  
+  for filename in args:
+    names = extract_names(filename)
+    text = '\n'.join(names)
+
+    if summary:
+      new_summary_file = open(filename + '.summary', 'w')
+      new_summary_file.write(text + '\n')
+      new_summary_file.close()
+    else:
+       print text
+
+    extract_names(args[0])
+
 if __name__ == '__main__':
   main()
+  
